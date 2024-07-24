@@ -12,10 +12,12 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const Book = require("./models/Book");
 const Review = require("./models/Review");
 const User = require("./models/User");
+const path = require("path");
 
 //view engine
 app.set("view engine", "ejs");
 app.set("views", "./views");
+app.set("views", path.join(__dirname, "views"));
 
 //middleware
 app.use(bodyParser.json());
