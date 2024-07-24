@@ -1,69 +1,49 @@
 const express = require("express");
 const router = express.Router();
 const Review = require("../models/Review");
+const Book = require("../models/Book");
+const User = require("../models/User");
 
-// Create a new review
-router.post("/", async (req, res) => {
-  try {
-    const review = new Review(req.body);
-    await review.save();
-    res.status(201).send(review);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// Get all reviews
+// Route to get all reviews and render them
 router.get("/", async (req, res) => {
+  console.log("Reviews route accessed");
   try {
-    const reviews = await Review.find().populate("userId").populate("bookId");
-    res.send(reviews);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+    const reviews = await Review.find()
+      .populate("bookId", "title") // Populate book details
+      .populate("userId", "username"); // Populate user details
 
-// Get a review by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const review = await Review.findById(req.params.id)
-      .populate("userId")
-      .populate("bookId");
-    if (!review) {
-      return res.status(404).send();
-    }
-    res.send(review);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+    // Debugging output
+    console.log("Reviews:", reviews);
 
-// Update a review by ID
-router.patch("/:id", async (req, res) => {
-  try {
-    const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
+    res.render("review_index", {
+      reviews: reviews.map((review) => ({
+        bookTitle: review.bookId ? review.bookId.title : "Unknown Book",
+        reviewerName: review.userId ? review.userId.username : "Unknown User",
+        rating: review.rating,
+        comment: review.comment,
+        createdAt: review.createdAt,
+      })),
     });
-    if (!review) {
-      return res.status(404).send();
-    }
-    res.send(review);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(500).send(error.message);
   }
 });
 
-// Delete a review by ID
-router.delete("/:id", async (req, res) => {
+// Route to add a new review
+router.post("/", async (req, res) => {
+  const { userId, bookId, rating, comment } = req.body;
+
   try {
-    const review = await Review.findByIdAndDelete(req.params.id);
-    if (!review) {
-      return res.status(404).send();
-    }
-    res.send(review);
+    const newReview = new Review({
+      userId,
+      bookId,
+      rating,
+      comment,
+    });
+    await newReview.save();
+    res.redirect("/reviews");
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send("Error adding review");
   }
 });
 

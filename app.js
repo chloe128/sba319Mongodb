@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use("/users", userRoutes);
 app.use("/books", bookRoutes);
-app.use("/reviews", reviewRoutes);
+app.use("/review", reviewRoutes);
 
 //route
 app.get("/", (req, res) => {
