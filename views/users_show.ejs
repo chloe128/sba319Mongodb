@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= user.username %></title>
+  </head>
+  <body>
+    <h1><%= user.username %></h1>
+    <p>Email: <%= user.email %></p>
+    <p>Created At: <%= user.createdAt %></p>
+    <a href="/users/<%= user._id %>/edit">Edit</a>
+    <form action="/users/<%= user._id %>?_method=DELETE" method="POST">
+      <button type="submit">Delete</button>
+    </form>
+    <a href="/users">Back to Users</a>
+  </body>
+</html>
